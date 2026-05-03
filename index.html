@@ -3,131 +3,179 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BlestApps — Catalogue de logiciels</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="css/css.css">
+  <title>BlestApps — Catalogue</title>
+  
 </head>
+
 <body>
 
-  <!-- ░░░ HEADER ░░░ -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="#" class="logo">
-        <span class="logo-bracket">[</span>BlestApps<span class="logo-bracket">]</span>
-      </a>
-      <nav class="header-nav">
-        <a href="#catalogue">Catalogue</a>
-        <a href="#ajouter">Ajouter</a>
-        <a href="https://github.com/" target="_blank" class="btn-github">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
-          GitHub
-        </a>
-      </nav>
-    </div>
-  </header>
+<header>
+  <h1>📦 BlestApps</h1>
+  <p>Catalogue de logiciels et applications</p>
+</header>
 
-  <!-- ░░░ HERO ░░░ -->
-  <section class="hero">
-    <div class="hero-grid-bg"></div>
-    <div class="hero-content">
-      <div class="hero-badge">Catalogue open-source</div>
-      <h1 class="hero-title">Découvrez des<br/><em>logiciels essentiels</em></h1>
-      <p class="hero-subtitle">Une sélection soigneuse d'applications et d'outils pour développeurs, designers et power users.</p>
-      <div class="hero-search-wrap">
-        <span class="search-icon">⌕</span>
-        <input type="text" id="searchInput" placeholder="Rechercher un logiciel, une catégorie…" autocomplete="off" />
-        <kbd>⌘K</kbd>
-      </div>
-      <div class="hero-stats" id="heroStats">
-        <span><strong id="statTotal">—</strong> logiciels</span>
-        <span class="dot">·</span>
-        <span><strong id="statCats">—</strong> catégories</span>
-        <span class="dot">·</span>
-        <span><strong id="statFeatured">—</strong> en vedette</span>
-      </div>
-    </div>
-    <div class="hero-scroll-hint">↓</div>
-  </section>
+<div class="search-bar">
+  <input type="text" id="search" placeholder="🔍  Rechercher un logiciel…" oninput="render()" />
+</div>
 
-  <!-- ░░░ FILTERS ░░░ -->
-  <section class="filters-bar" id="catalogue">
-    <div class="filters-inner">
-      <div class="filter-chips" id="filterChips">
-        <button class="chip active" data-filter="all">Tous</button>
-      </div>
-      <div class="sort-wrap">
-        <label for="sortSelect">Trier par</label>
-        <select id="sortSelect">
-          <option value="featured">En vedette</option>
-          <option value="date">Plus récent</option>
-          <option value="name">Nom A→Z</option>
-        </select>
-      </div>
-    </div>
-  </section>
+<div class="grid" id="grid"></div>
 
-  <!-- ░░░ CATALOGUE GRID ░░░ -->
-  <main class="catalogue" id="appGrid">
-    <div class="loading-state" id="loadingState">
-      <div class="spinner"></div>
-      <p>Chargement du catalogue…</p>
-    </div>
-  </main>
+<footer>BlestApps 2026 | Tous droits reservés</footer>
 
-  <!-- ░░░ MODAL ░░░ -->
-  <div class="modal-overlay" id="modalOverlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true">
-      <button class="modal-close" id="modalClose" aria-label="Fermer">✕</button>
-      <div class="modal-body" id="modalBody"></div>
-    </div>
-  </div>
+<script>
+/* ═══════════════════════════════════════════════
+   CHARGEMENT DYNAMIQUE DES APPLICATIONS
+═══════════════════════════════════════════════ */
+let APPS = [];
 
-  <!-- ░░░ ADD SECTION ░░░ -->
-  <section class="add-section" id="ajouter">
-    <div class="add-inner">
-      <div class="add-text">
-        <h2>Ajouter un logiciel</h2>
-        <p>Ce catalogue est piloté par des fichiers <code>.json</code>. Pour ajouter votre application, créez un fichier JSON dans le dossier <code>apps/</code> du dépôt GitHub et soumettez une Pull Request.</p>
-        <a href="https://github.com/" target="_blank" class="btn-primary">
-          Contribuer sur GitHub →
-        </a>
-      </div>
-      <div class="add-code">
-        <div class="code-header">
-          <span class="code-dot red"></span>
-          <span class="code-dot yellow"></span>
-          <span class="code-dot green"></span>
-          <span class="code-filename">apps/mon-app.json</span>
+async function loadApps() {
+  const grid = document.getElementById('grid');
+
+  try {
+    console.log("👉 Chargement manifest...");
+
+    const manifestRes = await fetch('apps/manifest.json');
+    console.log("Status:", manifestRes.status);
+
+    const text = await manifestRes.text();
+    console.log("Contenu brut:", text);
+
+    const manifest = JSON.parse(text);
+    console.log("Manifest JSON:", manifest);
+
+    const promises = manifest.apps.map(file => 
+      fetch(`apps/${file}`).then(res => res.json())
+    );
+
+    APPS = await Promise.all(promises);
+    render();
+
+  } catch (error) {
+    console.error("❌ ERREUR COMPLETE:", error);
+    grid.innerHTML = `<div class="empty">Erreur détectée. Voir console (F12)</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   RENDU
+═══════════════════════════════════════════════ */
+function formatDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('fr-FR', { 
+    day: 'numeric', 
+    month: 'short', 
+    year: 'numeric' 
+  });
+}
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const grid = document.getElementById('grid');
+
+  const filtered = APPS.filter(a => {
+    const txt = [
+      a.name,
+      a.tagline || '',
+      a.description,
+      a.category,
+      a.license || '',
+      ...(a.platform || []),
+      ...(a.tags || [])
+    ].join(' ').toLowerCase();
+    return txt.includes(q);
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty">Aucun résultat pour cette recherche.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(a => `
+    <div class="card">
+
+      <!-- FEATURED -->
+      ${a.featured ? `<div class="badge" style="background:#fde68a;color:#92400e;">⭐ Populaire</div>` : ''}
+
+      <div class="card-top">
+        <div class="card-icon">${a.icon || '📦'}</div>
+        <div>
+          <div class="card-name">${a.name}</div>
+          <div class="card-version">v${a.version} · ${a.category}</div>
         </div>
-        <pre><code>{
-  <span class="k">"name"</span>: <span class="s">"Mon Application"</span>,
-  <span class="k">"tagline"</span>: <span class="s">"Description courte"</span>,
-  <span class="k">"description"</span>: <span class="s">"Description complète…"</span>,
-  <span class="k">"version"</span>: <span class="s">"1.0.0"</span>,
-  <span class="k">"category"</span>: <span class="s">"Productivité"</span>,
-  <span class="k">"icon"</span>: <span class="s">"🚀"</span>,
-  <span class="k">"download_url"</span>: <span class="s">"https://…"</span>,
-  <span class="k">"published_at"</span>: <span class="s">"2025-01-01"</span>,
-  <span class="k">"platform"</span>: [<span class="s">"Windows"</span>, <span class="s">"macOS"</span>],
-  <span class="k">"license"</span>: <span class="s">"Gratuit"</span>,
-  <span class="k">"tags"</span>: [<span class="s">"tag1"</span>, <span class="s">"tag2"</span>],
-  <span class="k">"featured"</span>: <span class="v">false</span>
-}</code></pre>
       </div>
-    </div>
-  </section>
 
-  <!-- ░░░ FOOTER ░░░ -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <span class="logo-sm">[BlestApps]</span>
-      <span>Catalogue 2026</span>
-      <a href="https://github.com/" target="_blank">Voir le dépôt →</a>
-    </div>
-  </footer>
+      <!-- TAGLINE -->
+      ${a.tagline ? `<div style="font-size:.8rem;color:#6366f1;font-weight:500;">${a.tagline}</div>` : ''}
 
-  <script src="assets/js/main.js"></script>
+      <p class="card-desc">
+        ${truncate(a.description, 100)}
+        ${a.description.length > 100 
+          ? `<span style="color:#4f46e5; cursor:pointer;" onclick="openPopupByIndex(${APPS.indexOf(a)})"> Voir plus</span>` 
+          : ''
+        }
+      </p>
+
+      <!-- TAGS -->
+      <div style="display:flex;gap:.35rem;flex-wrap:wrap;">
+        ${(a.tags || []).map(t => `<span class="badge">${t}</span>`).join('')}
+      </div>
+
+      <div class="card-meta">
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap;">
+          ${(a.platform||[]).map(p => `<span class="badge">${p}</span>`).join('')}
+          ${a.license ? `<span class="badge">${a.license}</span>` : ''}
+          ${a.size ? `<span class="badge">${a.size}</span>` : ''}
+        </div>
+        <span>📅 ${formatDate(a.published_at)}</span>
+      </div>
+
+      <!-- ACTIONS -->
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+        ${a.download_url ? `<a class="btn-dl" href="${a.download_url}" target="_blank">↓ Télécharger</a>` : ''}
+        ${a.homepage_url ? `<a class="btn-dl" style="background:#10b981" href="${a.homepage_url}" target="_blank">🌐 Site</a>` : ''}
+      </div>
+
+    </div>
+  `).join('');
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', loadApps);
+
+function openPopup(app) {
+  document.getElementById('popup-title').innerText = app.name;
+  document.getElementById('popup-desc').innerText = app.description;
+  document.getElementById('popup').style.display = 'flex';
+}
+
+
+
+function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+}
+
+function truncate(text, max = 100) {
+  if (!text) return '';
+  return text.length > max ? text.substring(0, max) + '...' : text;
+}
+
+function openPopupByIndex(i) {
+  const app = APPS[i];
+  openPopup(app);
+}
+</script>
+
+<div id="popup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:white; max-width:600px; width:90%; border-radius:12px; padding:1.5rem; position:relative;">
+    
+    <button onclick="closePopup()" style="position:absolute; top:10px; right:10px; border:none; background:none; font-size:1.2rem; cursor:pointer;">✖</button>
+    
+    <h2 id="popup-title"></h2>
+    <p id="popup-desc" style="margin-top:1rem; line-height:1.6;"></p>
+
+  </div>
+</div>
+
 </body>
 </html>
